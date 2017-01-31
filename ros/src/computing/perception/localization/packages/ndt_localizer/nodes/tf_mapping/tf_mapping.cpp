@@ -128,7 +128,7 @@ void points_callback(const pcl::PointCloud<pcl::PointXYZI>::ConstPtr &input)
     }
     std::cout << "Wrote " << pcl_out.size() << " points to " << filename << "." << std::endl;
     added_scan_num++;
-    if(added_scan_num == 100)
+    if(added_scan_num == 50)
     {
       added_scan_num = 0;
       map_id++;

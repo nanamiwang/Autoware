@@ -25,16 +25,20 @@ int main (int argc, char** argv)
   for(i = 2; i < argc; i++){
     // Loading input_cloud.
     std::string input = argv[i];
-    pcl::PointCloud<pcl::PointXYZRGB>::Ptr input_cloud (new pcl::PointCloud<pcl::PointXYZRGB>);
-    if (pcl::io::loadPCDFile<pcl::PointXYZRGB> (input, *input_cloud) == -1){
+//    pcl::PointCloud<pcl::PointXYZRGB>::Ptr input_cloud (new pcl::PointCloud<pcl::PointXYZRGB>);
+    pcl::PointCloud<pcl::PointXYZI>::Ptr input_cloud (new pcl::PointCloud<pcl::PointXYZI>);
+//    if (pcl::io::loadPCDFile<pcl::PointXYZRGB> (input, *input_cloud) == -1){
+    if (pcl::io::loadPCDFile<pcl::PointXYZI> (input, *input_cloud) == -1){
       std::cout << "Couldn't find " << input << "." << std::endl;
       break;
     }
     std::cout << "Input: " << input << " (" << input_cloud->size () << " points) " << std::endl;
 
     // Filtering input scan
-    pcl::PointCloud<pcl::PointXYZRGB>::Ptr filtered_cloud (new pcl::PointCloud<pcl::PointXYZRGB>);
-    pcl::VoxelGrid<pcl::PointXYZRGB> voxel_grid_filter;
+//    pcl::PointCloud<pcl::PointXYZRGB>::Ptr filtered_cloud (new pcl::PointCloud<pcl::PointXYZRGB>);
+    pcl::PointCloud<pcl::PointXYZI>::Ptr filtered_cloud (new pcl::PointCloud<pcl::PointXYZI>);
+//    pcl::VoxelGrid<pcl::PointXYZRGB> voxel_grid_filter;
+    pcl::VoxelGrid<pcl::PointXYZI> voxel_grid_filter;
     voxel_grid_filter.setLeafSize (leaf_size, leaf_size, leaf_size);
     voxel_grid_filter.setInputCloud (input_cloud);
     voxel_grid_filter.filter (*filtered_cloud);

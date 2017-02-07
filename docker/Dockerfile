@@ -1,14 +1,20 @@
-FROM nvidia/cuda:8.0-ubuntu14.04
+FROM nvidia/cuda:8.0-devel-ubuntu14.04
 MAINTAINER Yuki Iida <aiueo.0409@gmail.com>
 
-RUN apt-get update && apt-get install -y \
+RUN sed -i 's/archive.ubuntu/cn.archive.ubuntu/g' /etc/apt/sources.list
+RUN cat /etc/apt/sources.list
+RUN apt-get update
+#RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
+RUN apt-get install -y console-setup
+RUN apt-get install -y \
         software-properties-common \
         wget curl git cmake cmake-curses-gui
 
 # Intall ROS
 RUN wget http://packages.ros.org/ros.key -O - | apt-key add -
 RUN echo "deb http://packages.ros.org/ros/ubuntu trusty main" > /etc/apt/sources.list.d/ros-latest.list
-RUN apt-get update && apt-get install -y \
+RUN apt-get update 
+RUN apt-get install -y \
         ros-indigo-desktop-full ros-indigo-nmea-msgs \
         ros-indigo-nmea-navsat-driver ros-indigo-sound-play \
         ros-indigo-jsk-visualization \
@@ -81,9 +87,18 @@ RUN echo "source /opt/ros/indigo/setup.bash" >> /home/$USERNAME/.bashrc && \
 USER autoware
 
 # Install Autoware
-RUN git clone https://github.com/CPFL/Autoware.git /home/$USERNAME/Autoware
+#RUN git clone https://github.com/CPFL/Autoware.git /home/$USERNAME/Autoware
+COPY Autoware.tar.gz /home/$USERNAME/
+RUN /bin/bash -c 'cd /home/$USERNAME; tar zxf Autoware.tar.gz'
+USER root
+RUN apt-get install -y libglew-dev
+USER autoware
 RUN /bin/bash -c 'source /opt/ros/indigo/setup.bash; cd /home/$USERNAME/Autoware/ros/src; catkin_init_workspace; cd ../; ./catkin_make_release'
 RUN echo "source /home/$USERNAME/Autoware/ros/devel/setup.bash" >> /home/$USERNAME/.bashrc
+
+LABEL com.nvidia.volumes.needed="nvidia_driver"
+ENV PATH /usr/local/nvidia/bin:${PATH}
+ENV LD_LIBRARY_PATH /usr/local/nvidia/lib:/usr/local/nvidia/lib64:${LD_LIBRARY_PATH}
 
 # Change Terminal Color
 RUN gconftool-2 --set "/apps/gnome-terminal/profiles/Default/use_theme_background" --type bool false
